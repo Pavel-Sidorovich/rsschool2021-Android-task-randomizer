@@ -1,44 +1,56 @@
 package com.rsschool.android2021
 
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.rsschool.android2021.databinding.FragmentSecondBinding
+import com.rsschool.android2021.utils.viewBinding
+import kotlin.random.Random
 
-class SecondFragment : Fragment() {
+class SecondFragment : Fragment(R.layout.fragment_second) {
 
-    private var backButton: Button? = null
-    private var result: TextView? = null
+    private val binding: FragmentSecondBinding by viewBinding(FragmentSecondBinding::bind)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_second, container, false)
+    private var listener: SecondFragmentEventListener? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = activity as? SecondFragmentEventListener
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        result = view.findViewById(R.id.result)
-        backButton = view.findViewById(R.id.back)
 
         val min = arguments?.getInt(MIN_VALUE_KEY) ?: 0
         val max = arguments?.getInt(MAX_VALUE_KEY) ?: 0
 
-        result?.text = generate(min, max).toString()
+        val result = generate(min, max).toString()
+        binding.result.text = result
 
-        backButton?.setOnClickListener {
-            // TODO: implement back
+        binding.back.setOnClickListener {
+            listener?.back(
+                previousResult = result.toInt()
+            )
         }
     }
 
     private fun generate(min: Int, max: Int): Int {
-        // TODO: generate random number
-        return 0
+        return when {
+            min > max -> {
+                max + Random.nextInt(min - max)
+            }
+            max - min < Int.MAX_VALUE - 1 -> {
+                min + Random.nextInt(max - min + 1)
+            }
+            else -> {
+                min + Random.nextInt(max - min)
+            }
+        }
+    }
+
+    interface SecondFragmentEventListener {
+        fun back(previousResult: Int)
     }
 
     companion object {
@@ -46,10 +58,10 @@ class SecondFragment : Fragment() {
         @JvmStatic
         fun newInstance(min: Int, max: Int): SecondFragment {
             val fragment = SecondFragment()
-            val args = Bundle()
-
-            // TODO: implement adding arguments
-
+            fragment.arguments = Bundle().apply {
+                putInt(MIN_VALUE_KEY, min)
+                putInt(MAX_VALUE_KEY, max)
+            }
             return fragment
         }
 
