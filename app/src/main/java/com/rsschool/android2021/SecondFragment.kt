@@ -8,11 +8,13 @@ import com.rsschool.android2021.databinding.FragmentSecondBinding
 import com.rsschool.android2021.utils.viewBinding
 import kotlin.random.Random
 
-class SecondFragment : Fragment(R.layout.fragment_second) {
+class SecondFragment : Fragment(R.layout.fragment_second), IOnBackPressed {
 
     private val binding: FragmentSecondBinding by viewBinding(FragmentSecondBinding::bind)
 
     private var listener: SecondFragmentEventListener? = null
+
+    private var result = "0"
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -25,7 +27,7 @@ class SecondFragment : Fragment(R.layout.fragment_second) {
         val min = arguments?.getInt(MIN_VALUE_KEY) ?: 0
         val max = arguments?.getInt(MAX_VALUE_KEY) ?: 0
 
-        val result = generate(min, max).toString()
+        result = generate(min, max).toString()
         binding.result.text = result
 
         binding.back.setOnClickListener {
@@ -49,10 +51,6 @@ class SecondFragment : Fragment(R.layout.fragment_second) {
         }
     }
 
-    interface SecondFragmentEventListener {
-        fun back(previousResult: Int)
-    }
-
     companion object {
 
         @JvmStatic
@@ -68,4 +66,15 @@ class SecondFragment : Fragment(R.layout.fragment_second) {
         private const val MIN_VALUE_KEY = "MIN_VALUE"
         private const val MAX_VALUE_KEY = "MAX_VALUE"
     }
+
+    override fun onBackPressed() {
+        listener?.back(
+            previousResult = result.toInt()
+        )
+        onDestroy()
+    }
+}
+
+interface SecondFragmentEventListener {
+    fun back(previousResult: Int)
 }

@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-public class MainActivity extends AppCompatActivity implements FirstFragment.FirstFragmentEventListener, SecondFragment.SecondFragmentEventListener {
+public class MainActivity extends AppCompatActivity implements FirstFragmentEventListener, SecondFragmentEventListener {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,6 +28,16 @@ public class MainActivity extends AppCompatActivity implements FirstFragment.Fir
         final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, secondFragment);
         transaction.commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.container);
+        if (fragment instanceof IOnBackPressed) {
+            ((IOnBackPressed) fragment).onBackPressed();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
